@@ -1,0 +1,70 @@
+<html>
+     <head>
+  <script type="application/x-javascript">
+
+var MDIntegrator = (function () {         
+  var r0 = [-0.822, 0.624];
+  var p0 = [-0.1, 0.1];
+
+  var deriv = function (r) {
+    var A = [-200., -100., -170., 15.];
+    var a = [-1., -1., -6.5, 0.7];
+    var b = [0., 0., 11., 0.6];
+    var c = [-10., -10., -6.5, 0.7];
+    var x = [1., 0., -0.5, -1.];
+    var y = [0., 0.5, 1.5, 1.];
+    d = [];
+    var arg = 0;
+    for (var i = 0; i < 2; i++) {
+      d[i] = 0.;
+    }
+    for (var i = 0; i < 4; i++) {
+      arg = a[i]*(r[0] - x[i])*(r[0] - x[i]) + b[i]*(r[0] - x[i])*(r[1] - y[i]) + c[i]*(r[1] - y[i])*(r[1] - y[i]);
+      d[0] += A[i]*Math.exp(arg)*(2.*a[i]*(r[0] - x[i]) + b[i]*(r[1] - y[i]));
+      d[1] += A[i]*Math.exp(arg)*(b[i]*(r[0] - x[i]) + 2.*c[i]*(r[1] - y[i]));
+    }
+    return d;
+  }
+
+  var verlet = function (q, p, dt) {
+    var d1 = [];
+    for (var i = 0; i < 2; i++) {
+      q[i] += 0.5*dt*p[i];
+    }
+    d1 = deriv(q);
+    for (var i = 0; i < 2; i++){
+      p[i] = p[i] - dt*d1[i];
+      q[i] += 0.5*dt*p[i];
+    }
+  }
+
+  var draw = function () {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    var dt1 = 0.01;
+    ctx.beginPath();
+    ctx.moveTo(r0[0]*150 + 240, r0[1]*150 + 100);
+    verlet(r0, p0, dt1);
+    ctx.lineTo(r0[0]*150 + 240, r0[1]*150 + 100);
+    ctx.stroke();
+  }
+
+  var init = function () {
+    return setInterval(draw, 10);
+  }
+
+  return {init: init};
+})();
+
+  </script>
+ </head>
+ <body align=middle onload="MDIntegrator.init();">
+   <canvas id="canvas" width="500" height="500">
+     <p>This animation requires a browser that supports the
+     <a href="http://www.w3.org/html/wg/html5/">HTML5</a> 
+     &lt;canvas&gt; feature.</p>
+   
+   </canvas>
+   <p>Trace of a particle in the Mueller potential
+ </body>
+</html>
+
